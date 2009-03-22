@@ -4,29 +4,13 @@ import re
 import os
 
 
-def isCodeTypeFile(filename):
-    """
-    isCodeTypeFile(str) --> bool
-    Returns whether the provided filename should have tags generated for it
-
-    >>> isCodeTypeFile("main.cpp")
-    True
-    >>> isCodeTypeFile("extension.h")
-    True
-    >>> # We're not interested in generating tags for python
-    >>> isCodeTypeFile("cppreader.py")
-    False
-    """
-    return None is not re.search("\.cpp|\.h", filename)
-
-
-def echoPathAction(fullpath):
+def echoPathAction(fullpath, filetype):
     """
     action(str) --> None
     Launches some action on the given directory
 
     >>> someName = 'directory'
-    >>> echoPathAction(someName)
+    >>> echoPathAction(someName, None)
     0
     """
     return os.system("echo "+ fullpath)
@@ -48,12 +32,61 @@ def dirNameIsPackageDir(path):
     return dirname == 'packages' or dirname == 'basekit'
 
 
+class CPlusPlusFiletype(object):
+    """
+    This class represents the C/C++ filetype
+    """
+
+    def __init__(self):
+        """
+        Constructor.
+        """
+        self.__extensions = ['c', 'cpp', 'h']
+        self.__extensionRE = self._compileExtensionRE()
+
+    def _compileExtensionRE(self):
+        """
+        _compileExtensionRE(self) --> SRE_object
+        Creates the compiled RE for C/C++ filetype
+        """
+        # search for any file ending in extensions
+        reExpression = reduce( lambda x,y: x +'$|'+ y, self.__extensions )
+        reExpression += '$'
+
+        return re.compile(reExpression)
+
+    def isFileMyType(self, filename):
+        """
+        isFileMyType(self, str) --> bool
+        Checks if the input file is for c++
+
+        >>> ft = CPlusPlusFiletype()
+        >>> ft.isFileMyType("main.cpp")
+        True
+        >>> ft.isFileMyType("extension.h")
+        True
+        >>> # We're not interested in generating tags for python
+        >>> ft.isFileMyType("cppreader.py")
+        False
+        """
+        return None is not self.__extensionRE.search(filename)
+
+
+    def ctagsCommand(self):
+        """
+        ctagsCommand(self) --> str
+        Returns the ctags command for building a tag file for this filetype.
+        """
+        return 'ctags --languages=c,c++ -R .'
+
+
+
 class DeepDirRunner(object):
     """
     Walks a directory to run an action on directories
     """
 
-    def __init__(self, action, trigger):
+    def __init__(self, action, trigger, filetype):
         """
         Constructor.
 
@@ -62,8 +95,10 @@ class DeepDirRunner(object):
         """
         assert action is not None
         assert trigger is not None
+        assert filetype is not None
         self._do_action = action
         self._should_trigger_action = trigger
+        self.__filetype = filetype
         self.paths = []
 
 
@@ -85,13 +120,13 @@ class DeepDirRunner(object):
         for dirpath, dirnames, filenames in os.walk(rootpath):
             if self._should_trigger_action(dirpath):
                 print '!!!!!!!!!! trigger !!!!!!!!!!'
-                self._do_action(dirpath)
+                self._do_action(dirpath, self.__filetype)
                 self.paths.append(dirpath)
                 del dirnames    # don't go any further
 
             else:
                 for filename in filenames:
-                    if isCodeTypeFile(filename):
+                    if self.__filetype.isFileMyType(filename):
                         print "Found a code file that we're" \
                                 +" not running action on: %s" % filename
 
