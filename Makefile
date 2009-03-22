@@ -1,6 +1,6 @@
 MODULE = deepdir.py
 MAIN = main.py
-ARGS = ml
+ARGS = testdata/ml
 
 .PHONY:	run test syntax clean
 
