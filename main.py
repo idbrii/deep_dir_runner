@@ -18,7 +18,7 @@ def main():
         return
 
     runner = deepdir.DeepDirRunner(
-        deepdir.echo_path_action
+        deepdir.run_ctags_action
         , deepdir.dir_name_is_package_dir
         , deepdir.CPlusPlusFiletype()
     )
