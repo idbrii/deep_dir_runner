@@ -4,28 +4,28 @@ import re
 import os
 
 
-def echoPathAction(fullpath, filetype):
+def echo_path_action(fullpath, filetype):
     """
-    action(str) --> None
+    echo_path_action(str) --> None
     Launches some action on the given directory
 
     >>> someName = 'directory'
-    >>> echoPathAction(someName, None)
+    >>> echo_path_action(someName, None)
     0
     """
     return os.system("echo "+ fullpath)
 
 
-def dirNameIsPackageDir(path):
+def dir_name_is_package_dir(path):
     """
-    dirNameIsPackageDir(str) --> bool
+    dir_name_is_package_dir(str) --> bool
     Returns true if the directory name is packages
 
-    >>> dirNameIsPackageDir('packages')
+    >>> dir_name_is_package_dir('packages')
     True
-    >>> dirNameIsPackageDir('basekit')
+    >>> dir_name_is_package_dir('basekit')
     True
-    >>> dirNameIsPackageDir('dime')
+    >>> dir_name_is_package_dir('dime')
     False
     """
     dirname = os.path.basename(path)
@@ -39,14 +39,15 @@ class CPlusPlusFiletype(object):
 
     def __init__(self):
         """
-        Constructor.
+        Constructor. Init file extension array and regex
         """
         self.__extensions = ['c', 'cpp', 'h']
-        self.__extensionRE = self._compileExtensionRE()
+        self.__extensionRE = self._compile_extension_regex()
 
-    def _compileExtensionRE(self):
+
+    def _compile_extension_regex(self):
         """
-        _compileExtensionRE(self) --> SRE_object
+        _compile_extension_regex(self) --> SRE_object
         Creates the compiled RE for C/C++ filetype
         """
         # search for any file ending in extensions
@@ -55,26 +56,27 @@ class CPlusPlusFiletype(object):
 
         return re.compile(reExpression)
 
-    def isFileMyType(self, filename):
+
+    def is_file_my_type(self, filename):
         """
-        isFileMyType(self, str) --> bool
+        is_file_my_type(self, str) --> bool
         Checks if the input file is for c++
 
         >>> ft = CPlusPlusFiletype()
-        >>> ft.isFileMyType("main.cpp")
+        >>> ft.is_file_my_type("main.cpp")
         True
-        >>> ft.isFileMyType("extension.h")
+        >>> ft.is_file_my_type("extension.h")
         True
         >>> # We're not interested in generating tags for python
-        >>> ft.isFileMyType("cppreader.py")
+        >>> ft.is_file_my_type("cppreader.py")
         False
         """
         return None is not self.__extensionRE.search(filename)
 
 
-    def ctagsCommand(self):
+    def get_ctags_command(self):
         """
-        ctagsCommand(self) --> str
+        get_ctags_command(self) --> str
         Returns the ctags command for building a tag file for this filetype.
         """
         return 'ctags --languages=c,c++ -R .'
@@ -126,7 +128,7 @@ class DeepDirRunner(object):
 
             else:
                 for filename in filenames:
-                    if self.__filetype.isFileMyType(filename):
+                    if self.__filetype.is_file_my_type(filename):
                         print "Found a code file that we're" \
                                 +" not running action on: %s" % filename
 

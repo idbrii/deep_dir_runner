@@ -13,11 +13,15 @@ def main():
     import sys
     try:
         rootpath = sys.argv[1]
-    except:
+    except IndexError:
         _usage()
         return
 
-    runner = deepdir.DeepDirRunner(deepdir.echoPathAction, deepdir.dirNameIsPackageDir)
+    runner = deepdir.DeepDirRunner(
+        deepdir.echo_path_action
+        , deepdir.dir_name_is_package_dir
+        , deepdir.CPlusPlusFiletype()
+    )
     runner.start_walking(rootpath)
 
 
