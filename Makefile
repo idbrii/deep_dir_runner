@@ -9,6 +9,9 @@ run:
 
 test:
 	python $(MODULE)
+	python action.py
+	python trigger.py
+	python filetype.py
 
 syntax:
 	python -c "import py_compile,sys; sys.stderr=sys.stdout; py_compile.compile(r'$(MODULE)')"

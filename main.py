@@ -12,6 +12,9 @@ Example: %s ~/code/someproject
 import sys
 
 import deepdir
+import action
+import trigger
+import filetype
 
 
 def _usage():
@@ -29,9 +32,9 @@ def main():
         return
 
     runner = deepdir.DeepDirRunner(
-        deepdir.run_ctags_action
-        , deepdir.dir_name_is_package_dir
-        , deepdir.CPlusPlusFiletype()
+        action.run_ctags_action
+        , trigger.dir_name_is_package_dir
+        , filetype.CPlusPlusFiletype()
     )
     runner.start_walking(rootpath)
 
